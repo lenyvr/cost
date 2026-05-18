@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  pizzaioli-cost-db:
+    image: postgres:18-alpine
+    container_name: pizzaioli-cost-db
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data_db:/var/lib/postgresql
+    networks:
+      - pizzaioli-network
+
+  pizzaioli-cost-app:
+    build: .
+    container_name: pizzaioli-cost-app
+    ports:
+      - "${APP_PORT}:8080"
+    environment:
+      # manage datasource to set up before configuration
+      SPRING_DATASOURCE_URL: jdbc:postgresql://pizzaioli-cost-db:5432/pizzaioli-cost-db
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      - postgres-db # indicates to run first the db
+    networks:
+      - pizzaioli-network
+networks:
+  pizzaioli-network:
+
