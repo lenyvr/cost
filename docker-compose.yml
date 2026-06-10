@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "5432:5432"
+      - "${DB_EXTERNAL_PORT}:5432"
     volumes:
       - ./data_db:/var/lib/postgresql
     networks:
@@ -17,14 +17,11 @@ services:
     build: .
     container_name: pizzaioli-cost-app
     ports:
-      - "${APP_PORT}:8080"
-    environment:
-      # manage datasource to set up before configuration
-      SPRING_DATASOURCE_URL: jdbc:postgresql://pizzaioli-cost-db:5432/pizzaioli-cost-db
-      SPRING_DATASOURCE_USERNAME: ${DB_USER}
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      - "${APP_EXTERNAL_PORT}:${APP_PORT}"
+    env_file:
+      - .env
     depends_on:
-      - pizzaioli-cost-db # indicates to run first the db
+      - pizzaioli-cost-db
     networks:
       - pizzaioli-network
 networks:
