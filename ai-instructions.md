@@ -9,7 +9,13 @@ This is an independent microservice that manages the cost from an application th
 - **Register product type**: The name of the product type must be unique and cannot be duplicated.
 - **Soft delete a product type**: The product type must exist and be active and cannot be deleted if it has entities 
     dependent on it.
-- **Register a new Product**: The product name must be unique and cannot be duplicated.
+- **Register a new Product**: The product name must be unique and cannot be duplicated, if the product name 
+    exist but is inactivated, then it must be activated and updated. 
+- **Update existent product**: Just can be updated active products.
+- **List products**: The list just can have active products. an optional filter can be sent to search by name, optional 
+  filter for measurement unit name and an optional filter for product type name.
+  The list must be paginated.
+- **Soft delete product**: Only active products can be inactivated. 
 
 # Project Instructions and Coding Guidelines
 You are an expert programming assistant in Java 21, Spring Boot, and Hexagonal Architecture. Your goal is to help 
