@@ -1,7 +1,10 @@
 server:
   port: ${APP_PORT}
-  forward-headers-strategy: framework
   address: 0.0.0.0
+  forward-headers-strategy: native
+  tomcat:
+    remoteip:
+      internal-proxies: ".*"
 spring:
   application:
     name: cost
