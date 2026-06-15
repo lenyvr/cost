@@ -29,17 +29,18 @@ public class CreateMeasurementUnitUseCase implements CreateMeasurementUnitUseCas
     }
 
     private MeasurementUnit verifyExistence(MeasurementUnit measurementUnit) {
-        MeasurementUnit measurementUnitFound = measurementUnitRepositorySPI.getByCode(measurementUnit.getCode());
-        if (Objects.nonNull(measurementUnitFound) && measurementUnitFound.isActive()) {
+        MeasurementUnit measurementUnitFoundByCode = measurementUnitRepositorySPI.getByCode(measurementUnit.getCode());
+        if (Objects.nonNull(measurementUnitFoundByCode) && measurementUnitFoundByCode.isActive()) {
             throw new MeasurementUnitAlreadyExistsException("Measurement Unit with code '" + measurementUnit.getCode()
                     + "' already exists.");
         }
 
-        measurementUnitFound = measurementUnitRepositorySPI.getByName(measurementUnit.getName());
-        if (Objects.nonNull(measurementUnitFound) && measurementUnitFound.isActive()) {
+        MeasurementUnit measurementUnitFoundByName = measurementUnitRepositorySPI.getByName(measurementUnit.getName());
+        if (Objects.nonNull(measurementUnitFoundByName) && measurementUnitFoundByName.isActive()) {
             throw new MeasurementUnitAlreadyExistsException("Measurement Unit with name '" + measurementUnit.getName()
                     + "' already exists.");
         }
-        return measurementUnitFound;
+        
+        return Objects.nonNull(measurementUnitFoundByCode) ? measurementUnitFoundByCode : measurementUnitFoundByName;
     }
 }

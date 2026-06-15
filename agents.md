@@ -61,7 +61,7 @@ Always strictly follow Hexagonal Architecture principles (Domain, Application, I
 ## 3. Technical Decisions Made
 *Record here any significant changes to the code, custom exceptions, mappers, or design patterns used.*
 - **Create measurement unit**: implemented via `CreateMeasurementUnitUseCase`. A custom domain exception 
-  `MeasurementUnitAlreadyExistsException` was created and handled globally via `@ControllerAdvice`.
+  `MeasurementUnitAlreadyExistsException` was created and handled globally via `@RestControllerAdvice`.
   DTOs implemented as `record`. Entity code mapped to primary key in DB.
 - **DTOs**: the DTOs class must lve in the infrastructure layer. 
 - **Use cases**:  the use cases should have an interface port to be called from the infrastructure layer. 

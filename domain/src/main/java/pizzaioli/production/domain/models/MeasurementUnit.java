@@ -1,6 +1,9 @@
 package pizzaioli.production.domain.models;
 
+import pizzaioli.production.domain.exceptions.ValueRequiredException;
+
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class MeasurementUnit {
     private String code;
@@ -9,10 +12,18 @@ public class MeasurementUnit {
     private LocalDateTime createdDate;
 
     public MeasurementUnit(String code, String name, boolean active, LocalDateTime createdDate) {
+        validateEmptyField(name,"name");
+        validateEmptyField(code,"code");
         this.code = code;
         this.name = name;
         this.active = active;
         this.createdDate = createdDate;
+    }
+
+    private void validateEmptyField(String field, String fieldName){
+        if(Objects.isNull(field) || field.trim().isEmpty()){
+            throw new ValueRequiredException(String.format("The field %s is required", fieldName));
+        }
     }
 
     public MeasurementUnit() {
@@ -23,6 +34,7 @@ public class MeasurementUnit {
     }
 
     public void setCode(String code) {
+        validateEmptyField(code,"code");
         this.code = code;
     }
 
@@ -31,6 +43,7 @@ public class MeasurementUnit {
     }
 
     public void setName(String name) {
+        validateEmptyField(name,"name");
         this.name = name;
     }
 
