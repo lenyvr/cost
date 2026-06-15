@@ -55,11 +55,18 @@ Always strictly follow Hexagonal Architecture principles (Domain, Application, I
 
 **Tasks to be done:**
 
-- [ ] Create measurement unit: 
+- [x] Create measurement unit: 
     - Follow Hexagonal layers. Remember business rules. Remember create DTOS for request and response. 
 
 ## 3. Technical Decisions Made
 *Record here any significant changes to the code, custom exceptions, mappers, or design patterns used.*
+- **Create measurement unit**: implemented via `CreateMeasurementUnitUseCase`. A custom domain exception 
+  `MeasurementUnitAlreadyExistsException` was created and handled globally via `@RestControllerAdvice`.
+  DTOs implemented as `record`. Entity code mapped to primary key in DB.
+- **DTOs**: the DTOs class must lve in the infrastructure layer. 
+- **Use cases**:  the use cases should have an interface port to be called from the infrastructure layer. 
+- **Mappers**: the logic for map from DTO to Model  or Dto to entity and vice versa should live in a separate class in
+ the infrastructure layer. 
 
 ## 4. Notes and Bugs
 *Note here if business information is missing, if there is a bug in Docker, or if there are any pending dependencies.*
