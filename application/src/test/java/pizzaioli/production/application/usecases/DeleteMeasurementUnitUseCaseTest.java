@@ -9,6 +9,8 @@ import pizzaioli.production.domain.exceptions.MeasurementUnitNotFoundException;
 import pizzaioli.production.domain.models.MeasurementUnit;
 import pizzaioli.production.domain.ports.output.MeasurementUnitRepositorySPI;
 
+import pizzaioli.production.domain.ports.output.ProductRepositorySPI;
+
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,6 +23,9 @@ class DeleteMeasurementUnitUseCaseTest {
     @Mock
     private MeasurementUnitRepositorySPI repositorySPI;
 
+    @Mock
+    private ProductRepositorySPI productRepositorySPI;
+
     @InjectMocks
     private DeleteMeasurementUnitUseCase useCase;
 
@@ -30,6 +35,7 @@ class DeleteMeasurementUnitUseCaseTest {
         String code = "GR";
         MeasurementUnit activeUnit = new MeasurementUnit(code, "Gramo", true, LocalDateTime.now());
         when(repositorySPI.getByCode(code)).thenReturn(activeUnit);
+        when(productRepositorySPI.existsActiveProductByMeasurementUnitCode(code)).thenReturn(false);
 
         // Act
         useCase.execute(code);
@@ -48,6 +54,7 @@ class DeleteMeasurementUnitUseCaseTest {
         // Act & Assert
         assertThrows(MeasurementUnitNotFoundException.class, () -> useCase.execute(code));
         verify(repositorySPI, never()).save(any());
+        verify(productRepositorySPI, never()).existsActiveProductByMeasurementUnitCode(anyString());
     }
 
     @Test
@@ -59,6 +66,20 @@ class DeleteMeasurementUnitUseCaseTest {
 
         // Act & Assert
         assertThrows(MeasurementUnitNotFoundException.class, () -> useCase.execute(code));
+        verify(repositorySPI, never()).save(any());
+        verify(productRepositorySPI, never()).existsActiveProductByMeasurementUnitCode(anyString());
+    }
+
+    @Test
+    void execute_WhenUnitHasActiveProducts_ShouldThrowException() {
+        // Arrange
+        String code = "GR";
+        MeasurementUnit activeUnit = new MeasurementUnit(code, "Gramo", true, LocalDateTime.now());
+        when(repositorySPI.getByCode(code)).thenReturn(activeUnit);
+        when(productRepositorySPI.existsActiveProductByMeasurementUnitCode(code)).thenReturn(true);
+
+        // Act & Assert
+        assertThrows(pizzaioli.production.domain.exceptions.MeasurementUnitHasDependenciesException.class, () -> useCase.execute(code));
         verify(repositorySPI, never()).save(any());
     }
 }

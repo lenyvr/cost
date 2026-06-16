@@ -8,6 +8,8 @@ import pizzaioli.production.application.usecases.DeleteMeasurementUnitUseCase;
 import pizzaioli.production.application.usecases.port.DeleteMeasurementUnitUseCaseSPI;
 import pizzaioli.production.domain.ports.output.MeasurementUnitRepositorySPI;
 
+import pizzaioli.production.domain.ports.output.ProductRepositorySPI;
+
 @Configuration
 public class BeanConfiguration {
 
@@ -17,7 +19,8 @@ public class BeanConfiguration {
     }
 
     @Bean
-    public DeleteMeasurementUnitUseCaseSPI deleteMeasurementUnitUseCase(MeasurementUnitRepositorySPI measurementUnitRepositorySPI) {
-        return new DeleteMeasurementUnitUseCase(measurementUnitRepositorySPI);
+    public DeleteMeasurementUnitUseCaseSPI deleteMeasurementUnitUseCase(MeasurementUnitRepositorySPI measurementUnitRepositorySPI, 
+                                                                        ProductRepositorySPI productRepositorySPI) {
+        return new DeleteMeasurementUnitUseCase(measurementUnitRepositorySPI, productRepositorySPI);
     }
 }

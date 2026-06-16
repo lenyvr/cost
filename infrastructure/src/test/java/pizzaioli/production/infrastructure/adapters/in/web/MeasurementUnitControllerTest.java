@@ -96,4 +96,17 @@ class MeasurementUnitControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("The measurement unit does not exist"));
     }
+
+    @Test
+    void delete_WhenUnitHasDependencies_ShouldReturnConflict() throws Exception {
+        // Arrange
+        String code = "GR";
+        doThrow(new pizzaioli.production.domain.exceptions.MeasurementUnitHasDependenciesException("No es posible eliminar el registro porque tiene dependencias."))
+                .when(deleteMeasurementUnitUseCaseSPI).execute(code);
+
+        // Act & Assert
+        mockMvc.perform(delete("/api/v1/measurement-units/{code}", code))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("No es posible eliminar el registro porque tiene dependencias."));
+    }
 }
