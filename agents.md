@@ -75,11 +75,19 @@ Always strictly follow Hexagonal Architecture principles (Domain, Application, I
 
 ## 3. Technical Decisions Made
 *Record here any significant changes to the code, custom exceptions, mappers, or design patterns used.*
-- **Create measurement unit**: implemented via `CreateMeasurementUnitUseCase`. A custom domain exception 
-  `MeasurementUnitAlreadyExistsException` was created and handled globally via `@RestControllerAdvice`.
-  DTOs implemented as `record`. Entity code mapped to primary key in DB.
-- **Delete measurement unit**: implemented via `DeleteMeasurementUnitUseCase` using logical deletion (setting `active` to `false`). A custom domain exception `MeasurementUnitNotFoundException` was created for handling units that don't exist or are already inactive, returning HTTP 404 via `@RestControllerAdvice`. Added `MeasurementUnitHasDependenciesException` to validate if there are active products using the unit before deleting, returning HTTP 409 via `@RestControllerAdvice`. The validation was refactored to use `ProductRepositorySPI` injected into the use case, supported by a new `ProductEntity` and `ProductJpaRepository` to maintain cleaner architecture constraints.
-- **Create/Delete product type**: Implemented via `CreateProductTypeUseCase` and `DeleteProductTypeUseCase`. Created corresponding domain exceptions (`ProductTypeAlreadyExistsException`, `ProductTypeNotFoundException`, `ProductTypeHasDependenciesException`) handled via `@RestControllerAdvice`. `ProductTypeEntity` uses auto-incremented ID. Product dependencies check uses `ProductRepositorySPI`.
+- **Create measurement unit**: implemented via `CreateMeasurementUnitUseCase`. The custom domain exception 
+  `MeasurementUnitAlreadyExistsException` was deleted, instead the generic exception `RecordAlreadyExistsException` was 
+used and handled globally via `@RestControllerAdvice`. DTOs implemented as `record`. Entity code mapped to primary key in DB.
+- **Delete measurement unit**: implemented via `DeleteMeasurementUnitUseCase` using logical deletion (setting `active` 
+to `false`). A custom domain exception `MeasurementUnitNotFoundException` was created for handling units that don't 
+exist or are already inactive, returning HTTP 404 via `@RestControllerAdvice`. Added `MeasurementUnitHasDependenciesException` 
+to validate if there are active products using the unit before deleting, returning HTTP 409 via `@RestControllerAdvice`. 
+The validation was refactored to use `ProductRepositorySPI` injected into the use case, supported by a new `ProductEntity` 
+and `ProductJpaRepository` to maintain cleaner architecture constraints.
+- **Create/Delete product type**: Implemented via `CreateProductTypeUseCase` and `DeleteProductTypeUseCase`. Created 
+generic domain exceptions (`RecordAlreadyExistsException`, `RecordNotFoundException`, 
+`RecordHasDependenciesException`) handled via `@RestControllerAdvice`. `ProductTypeEntity` uses auto-incremented ID. 
+Product dependencies check uses `ProductRepositorySPI`.
 - **DTOs**: the DTOs class must lve in the infrastructure layer. 
 - **Use cases**:  the use cases should have an interface port to be called from the infrastructure layer. 
 - **Mappers**: the logic for map from DTO to Model  or Dto to entity and vice versa should live in a separate class in
