@@ -57,6 +57,11 @@ Always strictly follow Hexagonal Architecture principles (Domain, Application, I
 
 - [x] Create measurement unit: 
     - Follow Hexagonal layers. Remember business rules. Remember create DTOS for request and response. 
+- [ ] Delete measurement unit: 
+    - The delete mode is logical, consist in set "false" value to the "active" field.
+    - The key in the request will be the "code", and the record must be searched through jpa.
+    - Only measurement units with "true" value in "active" field can be inactivated, otherwise, if the record does not
+  exist or exits but is inactivated, a friendly message should be given indicating that the measurement unit does not exist.
 
 ## 3. Technical Decisions Made
 *Record here any significant changes to the code, custom exceptions, mappers, or design patterns used.*
