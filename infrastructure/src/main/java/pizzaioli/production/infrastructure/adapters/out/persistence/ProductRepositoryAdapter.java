@@ -17,4 +17,9 @@ public class ProductRepositoryAdapter implements ProductRepositorySPI {
     public boolean existsActiveProductByMeasurementUnitCode(String measurementUnitCode) {
         return jpaRepository.existsByMeasurementUnitCodeAndActiveTrue(measurementUnitCode);
     }
+
+    @Override
+    public boolean existsActiveProductByProductTypeId(Integer productTypeId) {
+        return jpaRepository.existsByProductTypeIdAndActiveTrue(productTypeId);
+    }
 }
