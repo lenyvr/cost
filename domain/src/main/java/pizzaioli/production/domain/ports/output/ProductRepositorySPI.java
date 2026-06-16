@@ -1,0 +1,5 @@
+package pizzaioli.production.domain.ports.output;
+
+public interface ProductRepositorySPI {
+    boolean existsActiveProductByMeasurementUnitCode(String measurementUnitCode);
+}

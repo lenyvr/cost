@@ -4,10 +4,18 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+@Setter
+@Getter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "measurement_unit")
 public class MeasurementUnitEntity {
 
@@ -23,46 +31,4 @@ public class MeasurementUnitEntity {
 
     @Column(name = "created_date", nullable = false)
     private LocalDateTime createdDate;
-
-    public MeasurementUnitEntity() {
-    }
-
-    public MeasurementUnitEntity(String code, String name, boolean active, LocalDateTime createdDate) {
-        this.code = code;
-        this.name = name;
-        this.active = active;
-        this.createdDate = createdDate;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
-    }
 }
