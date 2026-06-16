@@ -57,7 +57,7 @@ Always strictly follow Hexagonal Architecture principles (Domain, Application, I
 
 - [x] Create measurement unit: 
     - Follow Hexagonal layers. Remember business rules. Remember create DTOS for request and response. 
-- [ ] Delete measurement unit: 
+- [x] Delete measurement unit: 
     - The delete mode is logical, consist in set "false" value to the "active" field.
     - The key in the request will be the "code", and the record must be searched through jpa.
     - Only measurement units with "true" value in "active" field can be inactivated, otherwise, if the record does not
@@ -68,6 +68,7 @@ Always strictly follow Hexagonal Architecture principles (Domain, Application, I
 - **Create measurement unit**: implemented via `CreateMeasurementUnitUseCase`. A custom domain exception 
   `MeasurementUnitAlreadyExistsException` was created and handled globally via `@RestControllerAdvice`.
   DTOs implemented as `record`. Entity code mapped to primary key in DB.
+- **Delete measurement unit**: implemented via `DeleteMeasurementUnitUseCase` using logical deletion (setting `active` to `false`). A custom domain exception `MeasurementUnitNotFoundException` was created for handling units that don't exist or are already inactive, returning HTTP 404 via `@RestControllerAdvice`.
 - **DTOs**: the DTOs class must lve in the infrastructure layer. 
 - **Use cases**:  the use cases should have an interface port to be called from the infrastructure layer. 
 - **Mappers**: the logic for map from DTO to Model  or Dto to entity and vice versa should live in a separate class in
