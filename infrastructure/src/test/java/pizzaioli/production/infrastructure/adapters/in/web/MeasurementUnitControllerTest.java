@@ -9,8 +9,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import pizzaioli.production.application.usecases.port.CreateMeasurementUnitUseCaseSPI;
 import pizzaioli.production.application.usecases.port.DeleteMeasurementUnitUseCaseSPI;
-import pizzaioli.production.domain.exceptions.MeasurementUnitAlreadyExistsException;
-import pizzaioli.production.domain.exceptions.MeasurementUnitNotFoundException;
+import pizzaioli.production.domain.exceptions.RecordNotFoundException;
+import pizzaioli.production.domain.exceptions.RecordAlreadyExistsException;
+import pizzaioli.production.domain.exceptions.RecordHasDependenciesException;
 import pizzaioli.production.domain.models.MeasurementUnit;
 import pizzaioli.production.infrastructure.dtos.request.CreateMeasurementUnitRequestDTO;
 
@@ -63,14 +64,14 @@ class MeasurementUnitControllerTest {
         CreateMeasurementUnitRequestDTO request = new CreateMeasurementUnitRequestDTO("GR", "Gramo");
 
         when(createMeasurementUnitUseCaseSPI.execute(any(MeasurementUnit.class)))
-                .thenThrow(new MeasurementUnitAlreadyExistsException("Measurement Unit with code 'GR' already exists."));
+                .thenThrow(new RecordAlreadyExistsException("Measurement Unit with code 'GR' already exists."));
 
         // Act & Assert
         mockMvc.perform(post("/api/v1/measurement-units")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("The measurement unit already exists"));
+                .andExpect(jsonPath("$.message").value("Measurement Unit with code 'GR' already exists."));
     }
 
     @Test
@@ -88,20 +89,20 @@ class MeasurementUnitControllerTest {
     void delete_WhenUnitNotFoundOrInactive_ShouldReturnNotFound() throws Exception {
         // Arrange
         String code = "NOT_EXIST";
-        doThrow(new MeasurementUnitNotFoundException("Measurement unit with code 'NOT_EXIST' does not exist or is already inactive."))
+        doThrow(new RecordNotFoundException("Measurement unit with code 'NOT_EXIST' does not exist or is already inactive."))
                 .when(deleteMeasurementUnitUseCaseSPI).execute(code);
 
         // Act & Assert
         mockMvc.perform(delete("/api/v1/measurement-units/{code}", code))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("The measurement unit does not exist"));
+                .andExpect(jsonPath("$.message").value("Measurement unit with code 'NOT_EXIST' does not exist or is already inactive."));
     }
 
     @Test
     void delete_WhenUnitHasDependencies_ShouldReturnConflict() throws Exception {
         // Arrange
         String code = "GR";
-        doThrow(new pizzaioli.production.domain.exceptions.MeasurementUnitHasDependenciesException("No es posible eliminar el registro porque tiene dependencias."))
+        doThrow(new RecordHasDependenciesException("No es posible eliminar el registro porque tiene dependencias."))
                 .when(deleteMeasurementUnitUseCaseSPI).execute(code);
 
         // Act & Assert

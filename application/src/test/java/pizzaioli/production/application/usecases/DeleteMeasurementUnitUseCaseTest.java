@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pizzaioli.production.domain.exceptions.MeasurementUnitNotFoundException;
+import pizzaioli.production.domain.exceptions.RecordNotFoundException;
 import pizzaioli.production.domain.models.MeasurementUnit;
 import pizzaioli.production.domain.ports.output.MeasurementUnitRepositorySPI;
 
@@ -52,7 +52,7 @@ class DeleteMeasurementUnitUseCaseTest {
         when(repositorySPI.getByCode(code)).thenReturn(null);
 
         // Act & Assert
-        assertThrows(MeasurementUnitNotFoundException.class, () -> useCase.execute(code));
+        assertThrows(RecordNotFoundException.class, () -> useCase.execute(code));
         verify(repositorySPI, never()).save(any());
         verify(productRepositorySPI, never()).existsActiveProductByMeasurementUnitCode(anyString());
     }
@@ -65,7 +65,7 @@ class DeleteMeasurementUnitUseCaseTest {
         when(repositorySPI.getByCode(code)).thenReturn(inactiveUnit);
 
         // Act & Assert
-        assertThrows(MeasurementUnitNotFoundException.class, () -> useCase.execute(code));
+        assertThrows(RecordNotFoundException.class, () -> useCase.execute(code));
         verify(repositorySPI, never()).save(any());
         verify(productRepositorySPI, never()).existsActiveProductByMeasurementUnitCode(anyString());
     }
@@ -79,7 +79,7 @@ class DeleteMeasurementUnitUseCaseTest {
         when(productRepositorySPI.existsActiveProductByMeasurementUnitCode(code)).thenReturn(true);
 
         // Act & Assert
-        assertThrows(pizzaioli.production.domain.exceptions.MeasurementUnitHasDependenciesException.class, () -> useCase.execute(code));
+        assertThrows(pizzaioli.production.domain.exceptions.RecordHasDependenciesException.class, () -> useCase.execute(code));
         verify(repositorySPI, never()).save(any());
     }
 }

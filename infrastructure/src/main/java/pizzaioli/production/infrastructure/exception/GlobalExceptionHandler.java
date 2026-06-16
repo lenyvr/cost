@@ -5,9 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import pizzaioli.production.domain.exceptions.MeasurementUnitAlreadyExistsException;
-import pizzaioli.production.domain.exceptions.MeasurementUnitHasDependenciesException;
-import pizzaioli.production.domain.exceptions.MeasurementUnitNotFoundException;
+import pizzaioli.production.domain.exceptions.RecordAlreadyExistsException;
+import pizzaioli.production.domain.exceptions.RecordHasDependenciesException;
+import pizzaioli.production.domain.exceptions.RecordNotFoundException;
+import pizzaioli.production.domain.exceptions.ValueRequiredException;
 import pizzaioli.production.infrastructure.dtos.ErrorResponseDTO;
 
 
@@ -15,24 +16,19 @@ import pizzaioli.production.infrastructure.dtos.ErrorResponseDTO;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(MeasurementUnitAlreadyExistsException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponseDTO handleMeasurementUnitAlreadyExistsException(MeasurementUnitAlreadyExistsException ex) {
-        log.error("Measurement Unit already exists: {}",ex.getMessage(), ex);
-        return new ErrorResponseDTO(HttpStatus.CONFLICT,"The measurement unit already exists");
-    }
-
-    @ExceptionHandler(MeasurementUnitNotFoundException.class)
+    @ExceptionHandler(RecordNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponseDTO handleMeasurementUnitNotFoundException(MeasurementUnitNotFoundException ex) {
-        log.error("Measurement Unit not found: {}",ex.getMessage(), ex);
-        return new ErrorResponseDTO(HttpStatus.NOT_FOUND,"The measurement unit does not exist");
+    public ErrorResponseDTO handleProductTypeNotFoundException(RecordNotFoundException ex) {
+        log.error("Record not found: {}",ex.getMessage(), ex);
+        return new ErrorResponseDTO(HttpStatus.NOT_FOUND,ex.getMessage());
     }
 
-    @ExceptionHandler(MeasurementUnitHasDependenciesException.class)
+    @ExceptionHandler({RecordHasDependenciesException.class
+    , RecordAlreadyExistsException.class
+    , ValueRequiredException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponseDTO handleMeasurementUnitHasDependenciesException(MeasurementUnitHasDependenciesException ex) {
-        log.error("Measurement Unit has dependencies: {}",ex.getMessage(), ex);
+    public ErrorResponseDTO handleConflictsException(RuntimeException ex) {
+        log.error(ex.getMessage(), ex);
         return new ErrorResponseDTO(HttpStatus.CONFLICT, ex.getMessage());
     }
 

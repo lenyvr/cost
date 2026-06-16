@@ -6,4 +6,5 @@ import pizzaioli.production.infrastructure.adapters.out.persistence.entity.Produ
 public interface ProductJpaRepository extends JpaRepository<ProductEntity, Integer> {
     
     boolean existsByMeasurementUnitCodeAndActiveTrue(String measurementUnitCode);
+    boolean existsByProductTypeIdAndActiveTrue(Integer productTypeId);
 }

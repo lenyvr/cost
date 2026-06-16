@@ -1,7 +1,7 @@
 package pizzaioli.production.application.usecases;
 
 import pizzaioli.production.application.usecases.port.CreateMeasurementUnitUseCaseSPI;
-import pizzaioli.production.domain.exceptions.MeasurementUnitAlreadyExistsException;
+import pizzaioli.production.domain.exceptions.RecordAlreadyExistsException;
 import pizzaioli.production.domain.models.MeasurementUnit;
 import pizzaioli.production.domain.ports.output.MeasurementUnitRepositorySPI;
 
@@ -31,13 +31,13 @@ public class CreateMeasurementUnitUseCase implements CreateMeasurementUnitUseCas
     private MeasurementUnit verifyExistence(MeasurementUnit measurementUnit) {
         MeasurementUnit measurementUnitFoundByCode = measurementUnitRepositorySPI.getByCode(measurementUnit.getCode());
         if (Objects.nonNull(measurementUnitFoundByCode) && measurementUnitFoundByCode.isActive()) {
-            throw new MeasurementUnitAlreadyExistsException("Measurement Unit with code '" + measurementUnit.getCode()
+            throw new RecordAlreadyExistsException("Measurement Unit with code '" + measurementUnit.getCode()
                     + "' already exists.");
         }
 
         MeasurementUnit measurementUnitFoundByName = measurementUnitRepositorySPI.getByName(measurementUnit.getName());
         if (Objects.nonNull(measurementUnitFoundByName) && measurementUnitFoundByName.isActive()) {
-            throw new MeasurementUnitAlreadyExistsException("Measurement Unit with name '" + measurementUnit.getName()
+            throw new RecordAlreadyExistsException("Measurement Unit with name '" + measurementUnit.getName()
                     + "' already exists.");
         }
         

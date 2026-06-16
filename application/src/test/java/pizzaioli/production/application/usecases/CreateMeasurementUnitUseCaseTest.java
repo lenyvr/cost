@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pizzaioli.production.domain.exceptions.MeasurementUnitAlreadyExistsException;
+import pizzaioli.production.domain.exceptions.RecordAlreadyExistsException;
 import pizzaioli.production.domain.models.MeasurementUnit;
 import pizzaioli.production.domain.ports.output.MeasurementUnitRepositorySPI;
 
@@ -55,7 +55,7 @@ class CreateMeasurementUnitUseCaseTest {
         when(repositorySPI.getByCode(requestUnit.getCode())).thenReturn(existingActive);
 
         // Act & Assert
-        assertThrows(MeasurementUnitAlreadyExistsException.class, () -> useCase.execute(requestUnit));
+        assertThrows(RecordAlreadyExistsException.class, () -> useCase.execute(requestUnit));
         verify(repositorySPI, never()).save(any());
     }
 
@@ -67,7 +67,7 @@ class CreateMeasurementUnitUseCaseTest {
         when(repositorySPI.getByName(requestUnit.getName())).thenReturn(existingActive);
 
         // Act & Assert
-        assertThrows(MeasurementUnitAlreadyExistsException.class, () -> useCase.execute(requestUnit));
+        assertThrows(RecordAlreadyExistsException.class, () -> useCase.execute(requestUnit));
         verify(repositorySPI, never()).save(any());
     }
 
