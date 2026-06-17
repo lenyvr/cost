@@ -7,8 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import pizzaioli.production.application.usecases.port.CreateMeasurementUnitUseCaseSPI;
-import pizzaioli.production.application.usecases.port.DeleteMeasurementUnitUseCaseSPI;
+import pizzaioli.production.application.usecases.port.MeasurementUnitUseCaseSPI;
 import pizzaioli.production.domain.exceptions.RecordNotFoundException;
 import pizzaioli.production.domain.exceptions.RecordAlreadyExistsException;
 import pizzaioli.production.domain.exceptions.RecordHasDependenciesException;
@@ -33,10 +32,7 @@ class MeasurementUnitControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private CreateMeasurementUnitUseCaseSPI createMeasurementUnitUseCaseSPI;
-
-    @MockitoBean
-    private DeleteMeasurementUnitUseCaseSPI deleteMeasurementUnitUseCaseSPI;
+    private MeasurementUnitUseCaseSPI measurementUnitUseCaseSPI;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -47,7 +43,7 @@ class MeasurementUnitControllerTest {
         CreateMeasurementUnitRequestDTO request = new CreateMeasurementUnitRequestDTO("GR", "Gramo");
         MeasurementUnit savedUnit = new MeasurementUnit("GR", "Gramo", true, LocalDateTime.now());
 
-        when(createMeasurementUnitUseCaseSPI.execute(any(MeasurementUnit.class))).thenReturn(savedUnit);
+        when(measurementUnitUseCaseSPI.create(any(MeasurementUnit.class))).thenReturn(savedUnit);
 
         // Act & Assert
         mockMvc.perform(post("/api/v1/measurement-units")
@@ -63,7 +59,7 @@ class MeasurementUnitControllerTest {
         // Arrange
         CreateMeasurementUnitRequestDTO request = new CreateMeasurementUnitRequestDTO("GR", "Gramo");
 
-        when(createMeasurementUnitUseCaseSPI.execute(any(MeasurementUnit.class)))
+        when(measurementUnitUseCaseSPI.create(any(MeasurementUnit.class)))
                 .thenThrow(new RecordAlreadyExistsException("Measurement Unit with code 'GR' already exists."));
 
         // Act & Assert
@@ -78,7 +74,7 @@ class MeasurementUnitControllerTest {
     void delete_WhenValidCode_ShouldReturnNoContent() throws Exception {
         // Arrange
         String code = "GR";
-        doNothing().when(deleteMeasurementUnitUseCaseSPI).execute(code);
+        doNothing().when(measurementUnitUseCaseSPI).delete(code);
 
         // Act & Assert
         mockMvc.perform(delete("/api/v1/measurement-units/{code}", code))
@@ -90,7 +86,7 @@ class MeasurementUnitControllerTest {
         // Arrange
         String code = "NOT_EXIST";
         doThrow(new RecordNotFoundException("Measurement unit with code 'NOT_EXIST' does not exist or is already inactive."))
-                .when(deleteMeasurementUnitUseCaseSPI).execute(code);
+                .when(measurementUnitUseCaseSPI).delete(code);
 
         // Act & Assert
         mockMvc.perform(delete("/api/v1/measurement-units/{code}", code))
@@ -103,7 +99,7 @@ class MeasurementUnitControllerTest {
         // Arrange
         String code = "GR";
         doThrow(new RecordHasDependenciesException("No es posible eliminar el registro porque tiene dependencias."))
-                .when(deleteMeasurementUnitUseCaseSPI).execute(code);
+                .when(measurementUnitUseCaseSPI).delete(code);
 
         // Act & Assert
         mockMvc.perform(delete("/api/v1/measurement-units/{code}", code))

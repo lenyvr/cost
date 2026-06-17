@@ -2,6 +2,8 @@ package pizzaioli.production.infrastructure.mapper;
 
 import pizzaioli.production.domain.models.ProductType;
 import pizzaioli.production.infrastructure.adapters.out.persistence.entity.ProductTypeEntity;
+import pizzaioli.production.infrastructure.dtos.request.CreateProductTypeRequestDTO;
+import pizzaioli.production.infrastructure.dtos.response.ProductTypeResponseDTO;
 
 import java.util.Objects;
 
@@ -38,5 +40,16 @@ public class ProductTypeMapper {
         productType.setCreatedDate(productTypeEntity.getCreatedDate());
 
         return productType;
+    }
+
+    public static ProductType toDomainFromDTO(CreateProductTypeRequestDTO requestDTO){
+        ProductType productType = new ProductType();
+        productType.setName(requestDTO.name());
+        productType.setActive(true);
+        return  productType;
+    }
+
+    public static ProductTypeResponseDTO toDTOFromDomain(ProductType productType) {
+        return new ProductTypeResponseDTO(productType.getName());
     }
 }

@@ -22,4 +22,9 @@ public class ProductRepositoryAdapter implements ProductRepositorySPI {
     public boolean existsActiveProductByProductTypeId(Integer productTypeId) {
         return jpaRepository.existsByProductTypeIdAndActiveTrue(productTypeId);
     }
+
+    @Override
+    public boolean existsActiveProductByProductCurrencyId(Integer productCurrencyId) {
+        return jpaRepository.existsByProductCurrencyIdAndActiveTrue(productCurrencyId);
+    }
 }

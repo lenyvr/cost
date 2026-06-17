@@ -1,11 +1,10 @@
 package pizzaioli.production.domain.models;
 
-import pizzaioli.production.domain.exceptions.ValueRequiredException;
+import pizzaioli.production.domain.validation.ValidateEmptyField;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
-public class MeasurementUnit {
+public class MeasurementUnit implements ValidateEmptyField {
     private String code;
     private String name;
     private boolean active;
@@ -18,12 +17,6 @@ public class MeasurementUnit {
         this.name = name;
         this.active = active;
         this.createdDate = createdDate;
-    }
-
-    private void validateEmptyField(String field, String fieldName){
-        if(Objects.isNull(field) || field.trim().isEmpty()){
-            throw new ValueRequiredException(String.format("The field %s is required", fieldName));
-        }
     }
 
     public MeasurementUnit() {

@@ -7,4 +7,5 @@ public interface ProductJpaRepository extends JpaRepository<ProductEntity, Integ
     
     boolean existsByMeasurementUnitCodeAndActiveTrue(String measurementUnitCode);
     boolean existsByProductTypeIdAndActiveTrue(Integer productTypeId);
+    boolean existsByProductCurrencyIdAndActiveTrue(Integer productCurrencyId);
 }
