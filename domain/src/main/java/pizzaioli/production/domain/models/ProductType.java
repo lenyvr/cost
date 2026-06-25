@@ -1,14 +1,17 @@
 package pizzaioli.production.domain.models;
 
+import pizzaioli.production.domain.validation.ValidateEmptyField;
+
 import java.time.LocalDateTime;
 
-public class ProductType {
+public class ProductType implements ValidateEmptyField {
     private Integer id;
     private String name;
     private boolean active;
     private LocalDateTime createdDate;
 
     public ProductType(Integer id, String name, boolean active, LocalDateTime createdDate) {
+        validateEmptyField(name,"name");
         this.id = id;
         this.name = name;
         this.active = active;
@@ -31,6 +34,7 @@ public class ProductType {
     }
 
     public void setName(String name) {
+        validateEmptyField(name,"name");
         this.name = name;
     }
 

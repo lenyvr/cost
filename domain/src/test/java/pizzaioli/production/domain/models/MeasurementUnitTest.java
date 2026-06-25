@@ -1,3 +1,5 @@
+package pizzaioli.production.domain.models;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import pizzaioli.production.domain.exceptions.ValueRequiredException;

@@ -4,44 +4,32 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pizzaioli.production.application.usecases.port.CreateProductTypeUseCaseSPI;
-import pizzaioli.production.application.usecases.port.DeleteProductTypeUseCaseSPI;
+import pizzaioli.production.application.usecases.port.ProductTypeUseCaseSPI;
 import pizzaioli.production.domain.models.ProductType;
 import pizzaioli.production.infrastructure.dtos.request.CreateProductTypeRequestDTO;
 import pizzaioli.production.infrastructure.dtos.response.ProductTypeResponseDTO;
+import pizzaioli.production.infrastructure.mapper.ProductTypeMapper;
 
 @RestController
 @RequestMapping("/api/v1/product-types")
 public class ProductTypeController {
 
-    private final CreateProductTypeUseCaseSPI createProductTypeUseCaseSPI;
-    private final DeleteProductTypeUseCaseSPI deleteProductTypeUseCaseSPI;
+    private final ProductTypeUseCaseSPI productTypeUseCaseSPI;
 
-    public ProductTypeController(CreateProductTypeUseCaseSPI createProductTypeUseCaseSPI,
-                                 DeleteProductTypeUseCaseSPI deleteProductTypeUseCaseSPI) {
-        this.createProductTypeUseCaseSPI = createProductTypeUseCaseSPI;
-        this.deleteProductTypeUseCaseSPI = deleteProductTypeUseCaseSPI;
+    public ProductTypeController(ProductTypeUseCaseSPI productTypeUseCaseSPI) {
+        this.productTypeUseCaseSPI = productTypeUseCaseSPI;
     }
 
     @PostMapping
-    public ResponseEntity<ProductTypeResponseDTO> create(@Valid @RequestBody CreateProductTypeRequestDTO requestDTO) {
-        ProductType newProductType = new ProductType();
-        newProductType.setName(requestDTO.name());
-        newProductType.setActive(true);
-
-        ProductType createdProductType = createProductTypeUseCaseSPI.execute(newProductType);
-
-        ProductTypeResponseDTO responseDTO = new ProductTypeResponseDTO(
-                createdProductType.getId(),
-                createdProductType.getName()
-        );
-
-        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductTypeResponseDTO create(@Valid @RequestBody CreateProductTypeRequestDTO requestDTO) {
+        ProductType createdProductType = productTypeUseCaseSPI.create(ProductTypeMapper.toDomainFromDTO(requestDTO));
+        return ProductTypeMapper.toDTOFromDomain(createdProductType);
     }
 
     @DeleteMapping("/{name}")
-    public ResponseEntity<Void> delete(@PathVariable String name) {
-        deleteProductTypeUseCaseSPI.execute(name);
-        return ResponseEntity.noContent().build();
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable String name) {
+        productTypeUseCaseSPI.delete(name);
     }
 }

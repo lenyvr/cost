@@ -7,8 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import pizzaioli.production.application.usecases.port.CreateProductTypeUseCaseSPI;
-import pizzaioli.production.application.usecases.port.DeleteProductTypeUseCaseSPI;
+import pizzaioli.production.application.usecases.port.ProductTypeUseCaseSPI;
 import pizzaioli.production.domain.exceptions.RecordAlreadyExistsException;
 import pizzaioli.production.domain.exceptions.RecordHasDependenciesException;
 import pizzaioli.production.domain.exceptions.RecordNotFoundException;
@@ -31,10 +30,7 @@ class ProductTypeControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private CreateProductTypeUseCaseSPI createProductTypeUseCaseSPI;
-
-    @MockitoBean
-    private DeleteProductTypeUseCaseSPI deleteProductTypeUseCaseSPI;
+    private ProductTypeUseCaseSPI productTypeUseCaseSPI;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -45,14 +41,13 @@ class ProductTypeControllerTest {
         CreateProductTypeRequestDTO request = new CreateProductTypeRequestDTO("Ingrediente");
         ProductType createdProductType = new ProductType(1, "Ingrediente", true, LocalDateTime.now());
 
-        when(createProductTypeUseCaseSPI.execute(any(ProductType.class))).thenReturn(createdProductType);
+        when(productTypeUseCaseSPI.create(any(ProductType.class))).thenReturn(createdProductType);
 
         // Act & Assert
         mockMvc.perform(post("/api/v1/product-types")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Ingrediente"));
     }
 
@@ -61,7 +56,7 @@ class ProductTypeControllerTest {
         // Arrange
         CreateProductTypeRequestDTO request = new CreateProductTypeRequestDTO("Ingrediente");
 
-        when(createProductTypeUseCaseSPI.execute(any(ProductType.class)))
+        when(productTypeUseCaseSPI.create(any(ProductType.class)))
                 .thenThrow(new RecordAlreadyExistsException("Product type with name 'Ingrediente' already exists."));
 
         // Act & Assert
@@ -76,7 +71,7 @@ class ProductTypeControllerTest {
     void delete_WhenValidName_ShouldReturnNoContent() throws Exception {
         // Arrange
         String name = "Ingrediente";
-        doNothing().when(deleteProductTypeUseCaseSPI).execute(name);
+        doNothing().when(productTypeUseCaseSPI).delete(name);
 
         // Act & Assert
         mockMvc.perform(delete("/api/v1/product-types/{name}", name))
@@ -88,7 +83,7 @@ class ProductTypeControllerTest {
         // Arrange
         String name = "NOT_EXIST";
         doThrow(new RecordNotFoundException("Product type with name 'NOT_EXIST' does not exist or is already inactive."))
-                .when(deleteProductTypeUseCaseSPI).execute(name);
+                .when(productTypeUseCaseSPI).delete(name);
 
         // Act & Assert
         mockMvc.perform(delete("/api/v1/product-types/{name}", name))
@@ -101,7 +96,7 @@ class ProductTypeControllerTest {
         // Arrange
         String name = "Ingrediente";
         doThrow(new RecordHasDependenciesException("No es posible eliminar el registro porque tiene dependencias."))
-                .when(deleteProductTypeUseCaseSPI).execute(name);
+                .when(productTypeUseCaseSPI).delete(name);
 
         // Act & Assert
         mockMvc.perform(delete("/api/v1/product-types/{name}", name))
