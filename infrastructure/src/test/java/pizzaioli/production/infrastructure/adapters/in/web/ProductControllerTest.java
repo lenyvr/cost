@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import pizzaioli.production.application.usecases.port.ProductUseCaseSPI;
 import pizzaioli.production.domain.exceptions.RecordAlreadyExistsException;
 import pizzaioli.production.domain.models.Product;
+import pizzaioli.production.infrastructure.exception.GlobalExceptionHandler;
 
 import java.time.LocalDateTime;
 
@@ -22,7 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = ProductController.class)
-@Import(pizzaioli.production.infrastructure.exception.GlobalExceptionHandler.class)
+@Import(GlobalExceptionHandler.class)
 @DisplayName("ProductController — Integration Tests")
 class ProductControllerTest {
 
