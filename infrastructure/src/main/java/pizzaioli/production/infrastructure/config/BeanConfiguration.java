@@ -4,8 +4,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import pizzaioli.production.application.usecases.MeasurementUnitUseCase;
 import pizzaioli.production.application.usecases.ProductCurrencyUseCase;
+import pizzaioli.production.application.usecases.ProductUseCase;
 import pizzaioli.production.application.usecases.port.MeasurementUnitUseCaseSPI;
 import pizzaioli.production.application.usecases.port.ProductCurrencyUseCaseSPI;
+import pizzaioli.production.application.usecases.port.ProductUseCaseSPI;
 import pizzaioli.production.domain.ports.output.MeasurementUnitRepositorySPI;
 
 import pizzaioli.production.domain.ports.output.ProductRepositorySPI;
@@ -34,4 +36,10 @@ public class BeanConfiguration {
     ,ProductRepositorySPI productRepositorySPI) {
         return new ProductCurrencyUseCase(productCurrencyRepositorySPI, productRepositorySPI);
     }
+
+    @Bean
+    public ProductUseCaseSPI createProductUseCase(ProductRepositorySPI productRepositorySPI) {
+        return new ProductUseCase(productRepositorySPI);
+    }
 }
+

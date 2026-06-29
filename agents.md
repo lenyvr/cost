@@ -4,9 +4,10 @@
 technical decision, record it here. Mark completed tasks with [x].*
 
 ## 1. Actual project status
-- **Current phase:** Design and implementation of infrastructure.
+- **Current phase:** Implementation of product use cases.
 - **Estructura base:** Already created (packages `domain`, `application`, `infrastructure` configured with Gradle
   Kotlin DSL and Docker).
+- **Testing:** Unit tests for use cases (Mockito + JUnit 5) and integration tests for controllers (@WebMvcTest + MockMvc) are in place.
 
 ### 1.1 Entity descriptions
 - **measurement_unit**:
@@ -82,6 +83,21 @@ Always strictly follow Hexagonal Architecture principles (Domain, Application, I
     - If there are dependant active products from this product currency,it can't be inactivated.
     - Only product currency with "true" value in "active" field can be inactivated, otherwise, if the record does not
       exist or exits but is inactivated, a friendly message should be given indicating that the measurement unit does not exist.
+- [x] Register new product:
+    - `name` must be unique (business key).
+    - If an inactive product with the same `name` exists, it must be reactivated (upsert), preserving `id` and `createdDate`.
+    - Required fields: `name`, `amountValue` (> 0), `measurementUnitCode`, `productCurrencyId`, `productTypeId`.
+    - FK integrity enforced by the database constraints defined in `schema.sql`.
+- [x] Unit tests for `ProductUseCase`:
+    - Test module: `application`. Framework: JUnit 5 + Mockito.
+    - Cases covered: successful creation, `RecordAlreadyExistsException` on active duplicate, upsert on inactive duplicate, forced `active=true`.
+- [x] Integration tests for `ProductController`:
+    - Test module: `infrastructure`. Framework: `@WebMvcTest` + MockMvc + `@MockitoBean`.
+    - Cases covered: 201 happy path, 409 conflict, 400 for each invalid field (name blank, amountValue null/negative, measurementUnitCode blank, productCurrencyId null, productTypeId null, empty body).
+- [ ] Edit product: Only can be edited existing actived products.
+- [ ] Delete product: 
+  - It's a soft delete, active field must be changed to "false" value.
+  - If the product exists but is inactive a friendly message must be sent to indicate that the product don't exist.
 
 ## 3. Technical Decisions Made
 *Record here any significant changes to the code, custom exceptions, mappers, or design patterns used.*
@@ -101,13 +117,26 @@ Product dependencies check uses `ProductRepositorySPI`.
 - **Create/Delete product currency**: Implemented via `ProductCurrencyUseCase`. 
 Same generic exceptions were used. Added `existsActiveProductByProductCurrencyId` to `ProductRepositorySPI` to validate dependencies.
 All mappings and DTOs were isolated to the `infrastructure` layer as required.
-- **DTOs**: the DTOs class must live in the infrastructure layer. 
-- **Use cases**:  the use cases should have an interface port to be called from the infrastructure layer. 
-- **Mappers**: the logic for map from DTO to Model  or Dto to entity and vice versa should live in a separate class in
- the infrastructure layer. 
-- **Controllers**: 
-  - Controllers class shouldn't create logic, they just call methods from class from it depends
-  - Controllers methods must be annotated with tag `@ResponseStatus` an the corresponding status. 
+- **Register product**: implemented via `ProductUseCase` (application layer, plain Java, no Spring annotations).
+  - `ProductRepositorySPI` extended with `save(Product)` and `getByName(String)` to support full CRUD alongside the pre-existing dependency-check methods.
+  - `ProductJpaRepository` extended with `findByName(String)` and generic type corrected from `Integer` to `Long` (consistent with `ProductEntity.id`).
+  - `ProductRepositoryAdapter` updated to implement the two new SPI methods.
+  - New files: `Product.java` (domain model), `ProductUseCaseSPI.java` (port), `ProductUseCase.java`, `CreateProductRequestDTO.java`, `ProductResponseDTO.java`, `ProductMapper.java`, `ProductController.java`.
+  - `BeanConfiguration` updated to register `ProductUseCase` as a `@Bean`.
+  - Endpoint: `POST /api/v1/products` → HTTP 201.
+- **GlobalExceptionHandler — MethodArgumentNotValidException**: added handler that maps `@Valid` failures to HTTP 400 and returns the field error messages joined by ", ". This fix applies globally to all controllers.
+- **DTOs**: the DTOs class must live in the infrastructure layer.
+- **Use cases**: the use cases should have an interface port to be called from the infrastructure layer.
+- **Mappers**: the logic for map from DTO to Model or Dto to entity and vice versa should live in a separate class in
+ the infrastructure layer.
+- **Controllers**:
+  - Controllers class shouldn't create logic, they just call methods from class from it depends.
+  - Controllers methods must be annotated with tag `@ResponseStatus` and the corresponding status.
+- **Testing strategy**:
+  - Unit tests live in the same module as the class under test (`application/src/test`, `infrastructure/src/test`).
+  - Use case tests: Mockito `@InjectMocks` + `@Mock` on the SPI; no Spring context needed.
+  - Controller tests: `@WebMvcTest(controllers = X.class)` + `@Import(GlobalExceptionHandler.class)` + `@MockitoBean` on the use case SPI. No database required.
+  - `infrastructure/src/test/resources/application.yaml` configured with H2 in-memory and `sql.init.mode: never` to avoid any real DB connection during slice tests.
 
 ## 4. Notes and Bugs
 *Note here if business information is missing, if there is a bug in Docker, or if there are any pending dependencies.*
